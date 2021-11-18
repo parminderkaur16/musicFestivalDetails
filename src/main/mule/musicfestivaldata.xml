@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="140206ae-787d-46ec-8d08-3b4bb038ec8f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="e627696f-7dad-4efd-a815-37691feb92b2" basePath="/codingtest/api/v1">
+		<http:request-connection host="eacp.energyaustralia.com.au" port="443" protocol="HTTPS"/>
+	</http:request-config>
+	<flow name="musicfestivaldataFlow">
+		<http:listener path="/test" allowedMethods="GET" doc:name="HTTP" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger"/>
+		<http:request method="GET" doc:name="HTTP" config-ref="HTTP_Request_configuration" path="/festivals"/>
+		<ee:transform doc:name="Transform Message" doc:id="f78e5d6a-26a4-4a2d-9c75-c3b04657272a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (item1, itemIndx) -> {
+	label: item1.name,
+	bands: 
+            {
+			name: item1.bands.name,
+			festivals: item1.bands.recordLabel
+			}
+	}
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger message="#[payload]" level="INFO" doc:name="Logger"/>
+	</flow>
+</mule>

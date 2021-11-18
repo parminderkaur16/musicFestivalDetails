@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="addtype" format="json">
+      <types:shape format="weave" example="examples/addition.json"><![CDATA[%dw 2.0
+
+type addtype = {|
+  add1: Number {"typeId": "int"}, 
+  add2: Number {"typeId": "int"}
+|} {"example": "{\\\"add1\\\":1,\\\"add2\\\":3}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#589ea72b-192f-49fc-8e30-3290071892bb">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="addtype"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
